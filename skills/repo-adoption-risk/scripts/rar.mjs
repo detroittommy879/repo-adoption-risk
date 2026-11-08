@@ -587,6 +587,7 @@ const pct = (x) => (x === null || x === undefined ? 'n/a' : `${round(x * 100)}%`
 // ---------------------------------------------------------------- GitHub access
 
 function ghAvailable() {
+  if (process.env.RAR_NO_GH) return false; // force the plain-API path (testing, or a broken gh install)
   try {
     execFileSync('gh', ['auth', 'status'], { stdio: 'pipe', timeout: 20000 });
     return true;

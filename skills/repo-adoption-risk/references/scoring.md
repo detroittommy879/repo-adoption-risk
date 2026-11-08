@@ -103,7 +103,7 @@ Bucket A = last 12 months, bucket B = the 12 months before. Each bucket is annua
 
 Worked examples (neutral):
 - Hits everyone, every use, blocks work, no workaround, fixed in 2 days, once in the last year: 1 x 1 x 1 x 2 days = 2 in A, rate = 1.3 bad days/yr: **Low**.
-- Weekly crash for everyone, open for 6 months: 1 x 1 x 0.15 x 180 = 27 in A, rate = 18: **High**.
+- Weekly crash for everyone, open for 6 months, no workaround: 1 x 1 x 0.15 x 180 = 27 in A, rate = 18: **High**, and because it is still open with no workaround (an active major red flag) the verdict becomes **Very High**. With an easy workaround (just restart) it is 0.4 x 27 = 10.8, rate = 7.2: **Moderate**, no flag.
 - Session-resume crash, occasional, open all year: 0.15 x 1 x 0.03 x 365 = 1.6 in A: barely registers neutrally, and drops to ~0.2 for someone who never resumes sessions.
 
 ### Risk level
