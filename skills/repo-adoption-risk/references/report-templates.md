@@ -1,6 +1,6 @@
 # Report templates
 
-State the chosen depth first: `Depth: Quick | Standard | Deep` (and "assumed" if it was defaulted).
+State the chosen depth first: `Depth: Quick | Standard | Deep` (add "assumed" if it was defaulted). Copy the Adoption Risk, bad days per year, red flags and Evidence Confidence from `rar.mjs score` exactly. Add a `Model override:` line only if you disagree, with the evidence.
 
 ## Quick: verdict card
 
@@ -9,16 +9,16 @@ Depth: Quick
 Project: <name> (<repo link>)   Last release: <version, date>   License: <x>
 
 Recommendation: Adopt / Trial cautiously / Wait / Avoid for now
-Adoption Risk: Low / Moderate / High / Very High
-Evidence Confidence: Low / Medium / High
+Adoption Risk: <script>  (~<N> bad days/yr for a typical user; personal: <level, N> if preferences exist)
+Evidence Confidence: <script>
 
-Top risks:
-1. <risk> - <one line> (<link>)
-2. <risk> - <one line> (<link>)
-3. <optional>
+What drives it:
+1. <family> - <severity, who it hits, how often, how long it was live> (<link>)
+2. <family> - ... (<link>)
 
+Red flags: <active flags from the script, or "none active">
 In its favor: <one concrete positive signal>
-Avoid if: <use cases most exposed>
+Avoid if: <conditional flags / feature- or platform-specific families>
 Want more? Say "standard" or "deep" and I'll continue from here.
 ```
 
@@ -27,58 +27,45 @@ Want more? Say "standard" or "deep" and I'll continue from here.
 ### Adoption verdict
 - **Depth:** Standard
 - **Recommendation:** Adopt / Trial cautiously / Wait / Avoid for now
-- **Adoption Risk:** Low / Moderate / High / Very High
-- **Evidence Confidence:** Low / Medium / High
-- **Complaint Recurrence:** Low / Medium / High / Severe
+- **Adoption Risk:** neutral <level> (<N> bad days/yr); personal <level> (<N>) if preferences exist
+- **Trend:** last 12 months vs the 12 before (improving / steady / worsening)
+- **Evidence Confidence:** <level and the script's reasons>
 - **Best fit:** who can reasonably tolerate the risk
-- **Avoid if:** which use cases are most exposed
+- **Avoid if:** use cases most exposed (conditional flags, feature- and platform-specific families)
 
-### Scorecard
-| Dimension | Score | Why |
-|---|---:|---|
-| Runtime Reliability | /100 | |
-| Data Safety | /100 | |
-| Upgrade Safety | /100 | |
-| Recovery Quality | /100 | |
-| Maintainer Response | /100 | |
-| Operational Predictability | /100 | |
+### What drives the number
+The script's family table (top families: severity, reach, trigger, live periods, bad days/yr). One line of plain-language context per family, with a link.
 
-### Top failure families
-One or two lines each: name, severity, time span, number of independent reports, status, workaround and its cost, link.
+### Red flags
+Active flags, conditional flags, and resolved notes exactly as the script lists them.
 
 ### Maintainer pattern
-A few sentences: quickly eliminated, repeatedly patched, ignored, or reintroduced.
+A few sentences using the measured numbers (first reply, time to close, not-planned share, hotfix rate, release cadence) plus what you saw: fixed at the root, repeatedly patched, ignored, or reintroduced.
 
 ### Positive evidence
 Meaningful counterevidence.
 
 ### Bottom line
-Plain-language: will adopting this save time or create maintenance/debugging work for the stated use case?
+Plain language: will adopting this save time or create maintenance/debugging work for the stated use case?
+
+### Questions (optional, after the report)
+Up to 3 questions from the script's list, about features this repo's bugs depend on. Store answers with `prefs set`.
 
 ## Deep
 
 Use the Standard structure, with these additions.
 
 ### Recurring failure families (detailed)
-For each important family:
-
-1. Name
-2. Severity
-3. Timeline: earliest -> latest evidence
-4. Number/type of independent reports
-5. Versions/platforms affected
-6. Current status
-7. Typical workaround and its cost/risk
-8. Evidence links (primary sources first)
+For each important family: name; severity, reach and trigger with the reasoning; timeline (each incident, dated by release where possible); number and type of independent reports; versions/platforms affected; current status; typical workaround and its cost/risk; evidence links (primary sources first).
 
 ### What users are saying
-Summarize recurring firsthand reports without cherry-picking inflammatory quotes. Separate concrete technical complaints from subjective dislike.
+Recurring firsthand reports, without cherry-picking inflammatory quotes. Separate concrete technical complaints from subjective dislike.
 
 ### Governance and sustainability
 Bus factor, active maintainers, funding or org backing, release discipline, contributor turnover.
 
 ### Security and health data
-OpenSSF Scorecard, advisories, dependency risk, if available. Note that these supplement, not replace, reliability evidence.
+OpenSSF Scorecard, advisories, dependency risk, if available. These supplement, not replace, reliability evidence.
 
 ### Method and limits
-Sources searched, time window, sources that could not be reached, what would change the verdict.
+Sources searched, time window, sources that could not be reached, ledger path, what would change the verdict.
