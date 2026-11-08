@@ -34,13 +34,13 @@ Uses the [`skills`](https://github.com/vercel-labs/skills) CLI, which installs i
 
 ```bash
 # interactive: pick agents and scope
-npx skills add <your-github-user>/repo-adoption-risk
+npx skills add detroittommy879/repo-adoption-risk
 
 # Claude Code only, globally (all projects)
-npx skills add <your-github-user>/repo-adoption-risk -a claude-code -g
+npx skills add detroittommy879/repo-adoption-risk -a claude-code -g
 
 # see what the repo contains without installing
-npx skills add <your-github-user>/repo-adoption-risk --list
+npx skills add detroittommy879/repo-adoption-risk --list
 ```
 
 Update or remove later with `npx skills update` / `npx skills remove repo-adoption-risk`. Run `npx skills --help` for current options, since flags can change between versions.
@@ -72,4 +72,4 @@ archive/SKILL_v1.0.0_old.md     # original single-depth version, kept for refere
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See LICENSE file.
