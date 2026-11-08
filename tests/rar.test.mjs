@@ -91,6 +91,17 @@ test('recurring data loss for common users escalates to at least High', () => {
   assert.equal(r.neutral.risk, 'High');
 });
 
+test('rare open data loss for common users: small bad-days number, but the critical flag floors it at High', () => {
+  const r = score(ledger([fam({ category: 'data-loss', severity: 'data-loss', reach: 'common', trigger: 'rare', workaround: 'destructive', incidents: [{ start: '2025-07-25', end: null }] })]));
+  assert.equal(r.neutral.baseRisk, 'Moderate');
+  assert.equal(r.neutral.risk, 'High');
+});
+
+test('Quick depth needs fewer searches before confidence drops to Low', () => {
+  const r = score(ledger([], { depth: 'quick', searches_run: 5, sample_reviewed: false }));
+  assert.equal(r.confidence.level, 'Medium');
+});
+
 test('old data-loss bug fixed slowly two years ago and never seen again does not escalate', () => {
   const r = score(ledger([fam({ category: 'data-loss', severity: 'data-loss', reach: 'common', trigger: 'occasional', incidents: [{ start: '2024-09-01', end: '2024-12-01' }] })]));
   assert.equal(r.families[0].flag.status, 'historical');

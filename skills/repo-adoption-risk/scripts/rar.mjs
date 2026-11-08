@@ -24,13 +24,13 @@ export const ENUMS = {
     'resource-growth', 'auth-network', 'config-reset', 'ui', 'security', 'other'],
   severity: ['data-loss', 'security', 'blocks-work', 'degraded', 'cosmetic'],
   reach: ['everyone', 'common', 'feature', 'platform', 'edge'],
-  trigger: ['every-use', 'daily', 'weekly', 'occasional', 'once'],
+  trigger: ['every-use', 'daily', 'weekly', 'occasional', 'rare', 'once'],
   workaround: ['none', 'easy', 'costly', 'destructive'],
 };
 
 export const W = {
   severity: { 'data-loss': 5, security: 5, 'blocks-work': 1, degraded: 0.3, cosmetic: 0.05 },
-  trigger: { 'every-use': 1, daily: 0.7, weekly: 0.15, occasional: 0.03, once: null },
+  trigger: { 'every-use': 1, daily: 0.7, weekly: 0.15, occasional: 0.03, rare: 0.004, once: null },
   reach: { everyone: 1, common: 0.5, feature: 0.15, platform: 0.3, edge: 0.03 },
   personalFeature: { yes: 1, sometimes: 0.5, no: 0.02 },
   platformMatch: 1,
@@ -431,7 +431,8 @@ export function scoreLedger(ledger, { collect = null, prefs = null, today = null
   const closed = families.flatMap((f) => f.incidents).filter((x) => !x.open);
   const releaseDated = closed.filter((x) => x.dated_by.endsWith('/release')).length;
   if (!hasCollect) confReasons.push('no collected GitHub data');
-  if (searches < 8) confReasons.push(`only ${searches} searches recorded`);
+  const minSearches = String(ledger.depth || '').toLowerCase() === 'quick' ? 4 : 8;
+  if (searches < minSearches) confReasons.push(`only ${searches} searches recorded`);
   if (families.length && weak / families.length > 0.5) confReasons.push('most families rest on single unconfirmed reports');
   if (confReasons.length) conf = 'Low';
   else if (searches >= 20 && ledger.sample_reviewed === true && (closed.length === 0 || releaseDated / closed.length >= 0.6)) {

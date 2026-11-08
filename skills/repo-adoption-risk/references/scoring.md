@@ -58,7 +58,7 @@ Between `common` and `edge`, ask: would a typical user of this tool plausibly hi
 
 Rule of thumb: high reactions alone do not make a bug `everyone`: popular niche bugs exist. Require the default-config check.
 
-**trigger** (while the bug is live, how often an exposed user hits it): `every-use` (every session/run), `daily`, `weekly`, `occasional` (about monthly or random), `once` (each user hits it at most once per incident, e.g. a one-time upgrade or migration step). A crash on a particular input that users may feed it again is `occasional`, not `once`.
+**trigger** (while the bug is live, how often an exposed user hits it): `every-use` (every session/run), `daily`, `weekly`, `occasional` (about monthly), `rare` (a user would hit it once or twice a year at most: most data-loss and "the agent did something destructive" reports belong here), `once` (each user hits it at most once per incident, e.g. a one-time upgrade or migration step). A crash on a particular input that users may feed it again is `occasional` or `rare`, not `once`. Ask: among exposed users, how often does one of them hit it? Severe outcomes are usually rare per user even when the tracker has many reports.
 
 **workaround**: `none` (stuck until a fix ships), `easy` (flag, setting, downgrade one version, retry), `costly` (manual steps, lost time, reinstall), `destructive` (delete database/config/history/cache with user data).
 
@@ -76,7 +76,7 @@ An issue closed as stale, duplicate, or "not planned" **without a fix** does not
 
 ### Special cases
 
-- **AI agents misbehaving** (deleting or overwriting files, running commands it was told not to, ignoring instructions): record it as a family like any other bug. Reach: `common` if it can happen with the default approval settings; `feature` with tag `auto-approve` if it needs auto-approve/"yolo"-style modes; `edge` only for genuinely unusual setups. Trigger is usually `occasional`. Severity follows the outcome (`data-loss` if user files are destroyed).
+- **AI agents misbehaving** (deleting or overwriting files, running commands it was told not to, ignoring instructions): record it as a family like any other bug. Reach: `common` **only** if the agent destroys or changes files without any approval prompt under default settings (or the prompt misrepresents what will run). If it needs auto-approve/"yolo"-style modes, or the user approved a command that was shown to them, use `feature` with tag `auto-approve`. Use `edge` for genuinely unusual setups. Trigger is almost always `rare`. Severity follows the outcome (`data-loss` if user files are destroyed).
 - **Service-side failures** (rate limits, capacity errors, a hosted backend being down) count when the tool depends on that service in its default setup, because users lose the time either way. Use category `auth-network`, and note in `notes` that it is server-side.
 - **Model quality complaints** ("answers got worse") are not reliability bugs. Leave them out unless they are concrete, reproducible failures.
 - **Process or supply-chain findings** (unpinned CI actions, missing signing, risky release workflow) are not families. Mention them in the report's security notes, not the ledger, unless they caused an actual incident.
@@ -109,7 +109,7 @@ hits = trigger_rate x days_live_in_bucket     (trigger "once": 1 hit if the inci
 | Factor | Values |
 |---|---|
 | severity_weight (bad-day equivalents per hit) | data-loss 5, security 5, blocks-work 1, degraded 0.3, cosmetic 0.05 |
-| trigger_rate (hits per live day) | every-use 1, daily 0.7, weekly 0.15, occasional 0.03, once (single hit) |
+| trigger_rate (hits per live day) | every-use 1, daily 0.7, weekly 0.15, occasional 0.03, rare 0.004 (~1.5/yr), once (single hit) |
 | reach, neutral | everyone 1, common 0.5, feature 0.15, platform 0.3, edge 0.03 |
 | reach, personal | feature: uses yes 1 / sometimes 0.5 / no 0.02; platform: listed 1 / not listed 0.02; unknown answers fall back to neutral |
 | workaround_mult | none 1, easy 0.4, costly 0.8, destructive 1.5 |
@@ -150,7 +150,7 @@ Pain is grouped by category: **Runtime** (crash, hang, correctness, performance,
 
 ### Confidence
 
-Starts at Medium. **Low** if `collect` data is missing, fewer than 8 searches were run, or more than half of families are single unconfirmed reports. **High** if collect data is present, at least 20 searches were run, the sample was reviewed, and at least 60% of incidents have both ends dated (release tags preferred).
+Starts at Medium. **Low** if `collect` data is missing, fewer than 8 searches were run (4 for Quick), or more than half of families are single unconfirmed reports. **High** if collect data is present, at least 20 searches were run, the sample was reviewed, and at least 60% of incidents have both ends dated (release tags preferred).
 
 ## Manual fallback
 
