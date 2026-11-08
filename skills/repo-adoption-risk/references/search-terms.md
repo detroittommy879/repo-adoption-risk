@@ -2,6 +2,15 @@
 
 Load for Standard and Deep scans. Combine terms with the project name; widen with synonyms and duplicate wording. Do not stop after one hit.
 
+## Balance first
+
+Failure-term searches always find something: mature, well-liked tools have dozens of crash/regression issues. Before and after searching:
+
+- Skim the `collect` output's **most-reacted** issues (what hurts the most people) and **most recent** issues (what people actually hit, unfiltered). Many families should come from there, not only from keyword hits.
+- For each family you find, look for its **fix** (release notes, closing PR, `rar.mjs fix-release`) and for whether it **came back**. A fixed, non-recurring family is a short incident, not a standing risk.
+- Search for positive evidence too: "fixed in", "postmortem", "regression test", "migration guide", "backup", "rollback".
+- Work out **who** each family hits (default config? one feature? one OS?) before deciding it matters.
+
 ## High-severity failure families (issues, discussions, release notes)
 
 - crash, panic, freeze, hang, startup failure, segfault
