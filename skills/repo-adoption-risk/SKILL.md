@@ -37,6 +37,8 @@ node "<absolute path of this skill's folder>/scripts/rar.mjs"
 
 Quote the path. Check once with `RAR --version`. It needs Node.js 18+ and no packages. It uses `gh` if installed and logged in, otherwise the public GitHub API.
 
+Harness tips: type the full `node "..."` command each time rather than defining shell functions or aliases (some harnesses block them). Edit the ledger with your file-editing tool, not heredocs. For reading a single issue, `gh api repos/OWNER/REPO/issues/N` and `.../issues/N/comments` are more reliable than `gh issue view`.
+
 **If Node is missing or the script cannot run**, use manual fallback: follow the same ledger rules and formula in [references/scoring.md](references/scoring.md) by hand for the top 3-5 families, show the arithmetic, lower Evidence Confidence one level, and say "manual scoring (no Node)".
 
 ## Step 2: Collect (one call, every depth)
@@ -83,12 +85,13 @@ If it reports ledger errors, fix them and re-run. Warnings are worth fixing too.
 - State the script's Adoption Risk, bad days per year, red flags, and Evidence Confidence exactly as given.
 - Red flags exist only if the script lists them. Its "resolved notes" and "historical" items are context, not escalations. "Conditional" flags belong in "Avoid if".
 - If you believe the verdict is wrong, do not change it. Add one separate line: `Model override: <your level>, because <specific evidence>`, and consider fixing the ledger instead (a mis-classified reach or trigger is the usual cause).
+- The **Recommendation** starts from the script's suggestion. You may move it one step when the user's stated use case clearly warrants it (e.g. a throwaway trial of a Moderate project can be "Adopt"); say why in the same line.
 
 ## Step 5: Personalize (after the report, optional, never blocking)
 
 The neutral verdict never reads stored preferences, so scans stay comparable. If the user has stored preferences, the script also shows a **Personal** column using them, and lists which ones it used and when they were set.
 
-If the score output lists **Questions for the user**, ask them **after** delivering the report (at most 3; use your harness's structured question tool if it has one; skip if the user is away or busy). Each question is about this repo's actual findings, e.g. "Do you use session-resume?". Store each answer exactly as given:
+If the score output lists no questions, skip this step. If it lists **Questions for the user**, ask them **after** delivering the report (at most 3; use your harness's structured question tool if it has one; skip if the user is away or busy). Each question is about this repo's actual findings, e.g. "Do you use session-resume?". Store each answer exactly as given:
 
 ```
 RAR prefs set feature.session-resume no                      # applies to future scans of any repo

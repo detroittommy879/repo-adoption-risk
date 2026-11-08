@@ -20,7 +20,7 @@ const DAY = 86400000;
 // ---------------------------------------------------------------- constants (see scoring.md)
 
 export const ENUMS = {
-  category: ['crash', 'hang', 'data-loss', 'upgrade-break', 'api-break', 'install-update', 'performance',
+  category: ['crash', 'hang', 'data-loss', 'correctness', 'upgrade-break', 'api-break', 'install-update', 'performance',
     'resource-growth', 'auth-network', 'config-reset', 'ui', 'security', 'other'],
   severity: ['data-loss', 'security', 'blocks-work', 'degraded', 'cosmetic'],
   reach: ['everyone', 'common', 'feature', 'platform', 'edge'],
@@ -49,6 +49,7 @@ export const FEATURE_TAGS = {
   'data-migration': 'migrating or importing data, including major-version migrations',
   'session-resume': 'resuming or restoring earlier sessions/conversations',
   'long-sessions': 'very long-running sessions or processes',
+  'auto-approve': 'letting an AI agent run commands/edits without asking (auto-approve, "yolo" modes)',
   plugins: 'plugins, extensions, MCP servers or add-ons',
   'multi-machine-sync': 'syncing across machines or cloud sync',
   'remote-ssh': 'remote development, SSH, containers or WSL',
@@ -460,6 +461,10 @@ export function scoreLedger(ledger, { collect = null, prefs = null, today = null
     questions.push({ key: `annoy.${topCat.category}`, values: 'low|normal|high', ask: `How much do ${topCat.category} bugs bother you compared with other bugs?`, because: topCat.title });
   }
 
+  if (releases.length) {
+    const undated = families.filter((f) => f.incidents.some((x) => !x.open && !x.dated_by.endsWith('/release'))).map((f) => f.id);
+    if (undated.length) warnings.push(`fixed incidents without a release tag in: ${undated.join(', ')}. Add fixed_in (try \`fix-release OWNER/REPO <issue>\` or the release notes) for better dates and confidence`);
+  }
   for (const t of unknownTags) warnings.push(`feature tag "${t}" is not in the standard list; reuse a standard tag if one fits so preferences carry across repos`);
 
   const usedList = [...prefsUsed.entries()].map(([k, v]) => ({
@@ -497,7 +502,7 @@ function summarizeCollect(c) {
 
 // ---------------------------------------------------------------- rendering
 
-const fmtDays = (x) => (x === null || x === undefined ? 'n/a' : x < 0.05 ? '~0' : String(round(x)));
+const fmtDays = (x) => (x === null || x === undefined ? 'n/a' : x < 0.05 ? '<0.05' : String(round(x)));
 
 export function renderScore(r) {
   if (!r.ok) return `Ledger has errors, fix them and re-run:\n${r.errors.map((e) => `- ${e}`).join('\n')}${r.warnings.length ? `\nWarnings:\n${r.warnings.map((w) => `- ${w}`).join('\n')}` : ''}`;
@@ -772,7 +777,7 @@ export async function fixRelease(repo, numbers, { client = makeClient() } = {}) 
       if (closer && closer.__typename === 'PullRequest' && closer.mergedAt) { fixT = parseDate(closer.mergedAt).getTime(); by = `PR #${closer.number} merged ${closer.mergedAt.slice(0, 10)}`; }
       else if (closer && closer.__typename === 'Commit') { fixT = parseDate(closer.committedDate).getTime(); by = `commit ${closer.oid.slice(0, 7)} ${closer.committedDate.slice(0, 10)}`; }
       const rel = fixT ? firstAfter(fixT) : null;
-      lines.push(`#${i.number} opened ${i.createdAt.slice(0, 10)} · closed ${i.closedAt ? i.closedAt.slice(0, 10) : 'open'}${i.stateReason ? ` (${i.stateReason.toLowerCase()})` : ''} · ${by} · first release after fix: ${rel ? `${rel.tag} (${iso(new Date(rel.t))})` : fixT ? 'none yet' : 'unknown'} · ${i.title}`);
+      lines.push(`#${i.number} opened ${i.createdAt.slice(0, 10)} · closed ${i.closedAt ? i.closedAt.slice(0, 10) : 'open'}${i.stateReason ? ` (${i.stateReason.toLowerCase()})` : ''} · ${by} · first release after fix: ${rel ? `${rel.tag} (${iso(new Date(rel.t))})` : fixT ? 'none yet (fixed on the main branch, unreleased: keep end null)' : 'unknown (no linked PR; check release notes)'} · ${i.title}`);
     } catch (e) { lines.push(`#${n}: lookup failed (${e.message})`); }
   }
   return lines.join('\n');
@@ -850,6 +855,14 @@ export async function main(argv = process.argv.slice(2)) {
         schema: 'rar-ledger/1', repo, scanned_at: iso(today), depth: flags.depth || 'standard', model: '',
         project_created: created, collect_file: collectFile, searches_run: 0, sample_reviewed: false,
         families: [], positives: [], sources_unreachable: [],
+        _example_family: {
+          _note: 'Shape reference only; ignored by the script. Copy into "families" and edit. Rules: references/scoring.md',
+          id: 'session-resume-crash', title: 'Crash when resuming an old session', category: 'crash', severity: 'blocks-work',
+          reach: 'feature', feature: 'session-resume', platforms: [], trigger: 'occasional', workaround: 'easy',
+          incidents: [{ start: '2025-03-01', end: '2025-03-04', introduced_in: 'v1.2.0', fixed_in: 'v1.2.1' }, { start: '2025-09-10', end: null }],
+          reports: 7, reactions: 40, duplicates: 3, confirmed: true, evidence: ['https://github.com/OWNER/REPO/issues/123'],
+          reach_reason: 'Only when resuming sessions older than a day; default flow unaffected.', notes: '',
+        },
       };
       const saved = writeJson(file, ledger, notes);
       console.log(`Ledger: ${saved}${collectFile ? `\nUsing collect data: ${collectFile}` : '\nNo collect data found; run collect first for release dates and metrics.'}\nFill "families" using the rules in references/scoring.md, then run: score "${saved}"`);
